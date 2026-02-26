@@ -12,6 +12,11 @@ O mapeamento físico dos sinais no Arduino Opta é estruturado da seguinte forma
 * **A4:** Peça Fixada / Clamp (Digital).
 * **RS485:** Comunicação Modbus RTU com o medidor Finder 7M a 38400 baud.
 
+## Montagem Física
+Abaixo está a representação da montagem física do sistema, detalhando a integração entre o painel da máquina CNC, o Arduino Opta e o medidor de energia Finder 7M no painel elétrico:
+
+![montagem](https://github.com/user-attachments/assets/bd2ca228-f3fa-41ba-86a2-1b2bc3e4a9c3)
+
 ## Arquitetura de Software (RTOS)
 O sistema é dividido em quatro threads principais para garantir a execução multitarefa em tempo real:
 * **machineThread:** Responsável pela amostragem rápida (ciclos de 50ms) e leitura dos sensores da máquina CNC.
@@ -46,10 +51,12 @@ Abaixo estão as visualizações dos dados processados na borda e enviados para 
 
 ### Dashboard de Produção e OEE
 Painel com os indicadores principais de operação, exibindo a contagem de peças, taxa de utilização da máquina e cadência produtiva atualizada em tempo real.
+
 <img width="1920" height="1080" alt="Captura de tela 2026-02-26 130714" src="https://github.com/user-attachments/assets/7022a33d-7407-4e7e-ace1-81decd611fe7" />
 
 ### Dashboard de Energia
 Painel dedicado ao monitoramento elétrico do equipamento, registrando o consumo de potência, fator de potência, tensão e corrente via integração Modbus RTU.
+
 <img width="1920" height="1080" alt="Captura de tela 2026-02-26 130533" src="https://github.com/user-attachments/assets/16fef7fa-5992-45d8-a39d-82e004d0d672" />
 
 ## Diagnóstico Visual
