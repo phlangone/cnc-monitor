@@ -41,23 +41,23 @@ using namespace rtos;
 /**
  * WiFi Credentials
  */
-constexpr const char WIFI_SSID[] = "Pos_Sist_Emb";
-constexpr const char WIFI_PASS[] = "LPFS@senai109";
+constexpr const char WIFI_SSID[] = "";
+constexpr const char WIFI_PASS[] = "";
 
 /**
  * MQTT Configuration
  */
-constexpr const char MQTT_BROKER_IP[] = "broker.app.wnology.io";
-constexpr uint16_t MQTT_BROKER_PORT = 1883;
+constexpr const char MQTT_BROKER_IP[] = "";
+constexpr uint16_t MQTT_BROKER_PORT = ;
 
-constexpr const char MQTT_CLIENT_ID[] = "694170f6d09b5139ea5d287d";
-constexpr const char MQTT_USERNAME[] = "962fdf25-b123-4c75-a6e4-59b368596049";
-constexpr const char MQTT_PASSWORD[] = "83154899704548b9c3fc418daa40476d186e03032f4b76d8baf563f0ed32d5c2";
+constexpr const char MQTT_CLIENT_ID[] = "";
+constexpr const char MQTT_USERNAME[] = "";
+constexpr const char MQTT_PASSWORD[] = "";
 
 /**
  * Tópicos MQTT
  */
-constexpr const char MQTT_TOPIC_STATE[] = "wnology/694170f6d09b5139ea5d287d/state";
+constexpr const char MQTT_TOPIC_STATE[] = "";
 
 /**
  * MQTT Reconnection
