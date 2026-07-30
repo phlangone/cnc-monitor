@@ -1,18 +1,8 @@
-/**
- * Standard libs
- */
 #include <stdio.h>
 #include <stdarg.h>
-
-/**
- * Mbed ScopedLock header
- */
 #include <ScopedLock.h>
 
-/**
- * Header file
- */
-#include "logger.h"
+#include "Logger.h"
 
 void Logger::begin(unsigned long baudRate)
 {
@@ -24,9 +14,9 @@ void Logger::setEnabled(bool enabled)
     enabled_ = enabled;
 }
 
-void Logger::printf(const char *fmt, ...)
+void Logger::printf(const char* fmt, ...)
 {
-    if(!enabled_)
+    if (!enabled_)
     {
         return;
     }
