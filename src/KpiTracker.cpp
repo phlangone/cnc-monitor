@@ -1,3 +1,7 @@
+/**
+ * @file KpiTracker.cpp
+ * @brief Implementação do cálculo dos indicadores da CNC.
+ */
 #include "KpiTracker.h"
 
 void KpiTracker::begin()

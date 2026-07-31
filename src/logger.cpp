@@ -1,3 +1,7 @@
+/**
+ * @file Logger.cpp
+ * @brief Implementação da classe de registro de mensagens.
+ */
 #include <stdio.h>
 #include <stdarg.h>
 #include <ScopedLock.h>

@@ -1,3 +1,7 @@
+/**
+ * @file KpiTracker.h
+ * @brief Declaração da classe de cálculo dos indicadores da CNC.
+ */
 #pragma once
 
 #include "MachineMonitor.h"

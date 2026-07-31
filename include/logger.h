@@ -1,3 +1,7 @@
+/**
+ * @file Logger.h
+ * @brief Declaração da classe de registro de mensagens.
+ */
 #pragma once
 
 #include <Arduino.h>

@@ -1,3 +1,7 @@
+/**
+ * @file Led.cpp
+ * @brief Implementação da classe de controle de LED.
+ */
 #include <ScopedLock.h>
 
 #include "Led.h"

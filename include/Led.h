@@ -1,3 +1,7 @@
+/**
+ * @file Led.h
+ * @brief Declaração da classe de controle de LED.
+ */
 #pragma once
 
 #include <Arduino.h>

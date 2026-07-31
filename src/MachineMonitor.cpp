@@ -1,4 +1,25 @@
+/**
+ * @file MachineMonitor.cpp
+ * @brief Implementação do monitoramento dos sinais da CNC.
+ */
 #include "MachineMonitor.h"
+
+MachineMonitor::MachineMonitor(
+    uint8_t machineOnPin,
+    uint8_t machineReadyPin,
+    uint8_t doorClosedPin,
+    uint8_t doorOpenedPin,
+    uint8_t partClampedPin,
+    uint8_t spindleRunningPin
+)
+    : machineOnPin_{machineOnPin},
+        machineReadyPin_{machineReadyPin},
+        doorClosedPin_{doorClosedPin},
+        doorOpenedPin_{doorOpenedPin},
+        partClampedPin_{partClampedPin},
+        spindleRunningPin_{spindleRunningPin}
+{
+}
 
 void MachineMonitor::begin()
 {

@@ -1,3 +1,7 @@
+/**
+ * @file MachineMonitor.h
+ * @brief Declaração da classe de monitoramento dos sinais da CNC.
+ */
 #pragma once
 
 #include <Arduino.h>
@@ -56,15 +60,7 @@ public:
         uint8_t doorOpenedPin,
         uint8_t partClampedPin,
         uint8_t spindleRunningPin
-    )
-        : machineOnPin_{machineOnPin},
-          machineReadyPin_{machineReadyPin},
-          doorClosedPin_{doorClosedPin},
-          doorOpenedPin_{doorOpenedPin},
-          partClampedPin_{partClampedPin},
-          spindleRunningPin_{spindleRunningPin}
-    {
-    }
+    );
 
     /**
      * @brief Inicializa os pinos utilizados pelo monitor.
