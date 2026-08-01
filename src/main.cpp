@@ -1,20 +1,14 @@
 #include <Arduino.h>
-#include "Logger.h"
-#include "Led.h"
 
-Logger logger{Serial};
-Led led{PIN_A0, LedState::Off};
+#include "application/Application.h"
 
 void setup()
 {
-    Serial.begin(115200);
-
-    logger.setEnabled(true);
-    logger.printf("Teste do Logger");
-
-    led.begin();
+    static cnc::Application application;
+    application.start();
 }
 
 void loop()
 {
+    delay(1000U);
 }
