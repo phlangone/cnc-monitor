@@ -237,4 +237,8 @@ Then edit `secrets.ini` with the real values for:
 - MQTT username and password
 - MQTT topic
 
-Do not commit `secrets.ini`. Only `secrets.example.ini` should be versioned.
+---
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
