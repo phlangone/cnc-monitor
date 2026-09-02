@@ -20,7 +20,7 @@ std::size_t serializeTelemetry(const SystemSnapshot &snapshot, const char *const
                                      "\"powerFactor\":%.3f,\"frequencyHz\":%.2f,"
                                      "\"activeEnergyKWh\":%.3f,"
                                      "\"machineOn\":%u,\"machineReady\":%u,\"doorClosed\":%u,"
-                                     "\"doorOpened\":%u,\"partClamped\":%u,\"spindleRunning\":%u,"
+                                     "\"doorOpened\":%u,\"partClamped\":%u,\"programEnd\":%u,"
                                      "\"machineOnTimeS\":%lu,\"operationTimeS\":%lu,"
                                      "\"utilizationRate\":%.1f,\"partCount\":%lu,"
                                      "\"cycleTimeS\":%.3f,\"cadence\":%.1f}}",
@@ -37,7 +37,7 @@ std::size_t serializeTelemetry(const SystemSnapshot &snapshot, const char *const
                                      static_cast<unsigned int>(snapshot.machine.doorClosed),
                                      static_cast<unsigned int>(snapshot.machine.doorOpened),
                                      static_cast<unsigned int>(snapshot.machine.partClamped),
-                                     static_cast<unsigned int>(snapshot.machine.spindleRunning),
+                                     static_cast<unsigned int>(snapshot.machine.programEnd),
                                      static_cast<unsigned long>(snapshot.kpis.machineOnTimeS),
                                      static_cast<unsigned long>(snapshot.kpis.operationTimeS),
                                      static_cast<double>(snapshot.kpis.utilizationRate),

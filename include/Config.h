@@ -52,24 +52,24 @@
 #define CNC_MACHINE_ON_PIN PIN_A0
 #endif
 
-#ifndef CNC_SPINDLE_RUNNING_PIN
-#define CNC_SPINDLE_RUNNING_PIN PIN_A1
+#ifndef CNC_PROGRAM_END_PIN
+#define CNC_PROGRAM_END_PIN PIN_A1
 #endif
 
 #ifndef CNC_DOOR_CLOSED_PIN
-#define CNC_DOOR_CLOSED_PIN PIN_A2
+#define CNC_DOOR_CLOSED_PIN PIN_A4
 #endif
 
 #ifndef CNC_DOOR_OPENED_PIN
-#define CNC_DOOR_OPENED_PIN PIN_A3
+#define CNC_DOOR_OPENED_PIN PIN_A5
 #endif
 
 #ifndef CNC_PART_CLAMPED_PIN
-#define CNC_PART_CLAMPED_PIN PIN_A4
+#define CNC_PART_CLAMPED_PIN PIN_A3
 #endif
 
 #ifndef CNC_MACHINE_READY_PIN
-#define CNC_MACHINE_READY_PIN PIN_A5
+#define CNC_MACHINE_READY_PIN PIN_A1
 #endif
 
 /** @brief Configurações imutáveis utilizadas pelos componentes do firmware. */
@@ -103,8 +103,8 @@ constexpr std::uint32_t finderBaud = 38400U;
 
 /** Entrada digital que informa máquina ligada. */
 constexpr pin_size_t machineOnPin = CNC_MACHINE_ON_PIN;
-/** Entrada digital que informa spindle em funcionamento. */
-constexpr pin_size_t spindleRunningPin = CNC_SPINDLE_RUNNING_PIN;
+/** Entrada digital que informa a ocorrência do fim de programa (M30). */
+constexpr pin_size_t programEndPin = CNC_PROGRAM_END_PIN;
 /** Entrada digital que informa porta fechada. */
 constexpr pin_size_t doorClosedPin = CNC_DOOR_CLOSED_PIN;
 /** Entrada digital que informa porta aberta. */

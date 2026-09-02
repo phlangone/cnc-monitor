@@ -18,8 +18,9 @@ namespace cnc
  *
  * A classe é independente de Arduino e RTOS. O chamador fornece um instante
  * monotônico, o que permite testes nativos determinísticos.
- * Uma operação produtiva é reconhecida quando a peça está fixada e o spindle
- * está em funcionamento, preservando a regra do firmware legado.
+ * Uma operação produtiva é inferida enquanto a porta está fechada, a peça está
+ * fixada e o fim de programa ainda não ocorreu. Cada borda de ativação do fim
+ * de programa contabiliza uma peça concluída.
  */
 class KpiTracker final
 {
@@ -53,10 +54,9 @@ class KpiTracker final
     Milliseconds machineOnTime_{0};
     Milliseconds operationTime_{0};
     MonotonicTimePoint previousUpdate_{};
-    MonotonicTimePoint previousCycleStart_{};
+    MonotonicTimePoint previousProgramEnd_{};
     float smoothedCycleTimeMs_{0.0F};
-    bool previousPartClamped_{false};
-    bool hasCycleStart_{false};
+    bool hasPreviousProgramEnd_{false};
     bool initialized_{false};
 };
 

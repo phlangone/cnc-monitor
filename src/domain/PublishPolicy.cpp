@@ -15,7 +15,7 @@ bool PublishPolicy::shouldPublish(const MachineData &current,
                               current.doorClosed != lastPublished_.doorClosed ||
                               current.doorOpened != lastPublished_.doorOpened ||
                               current.partClamped != lastPublished_.partClamped ||
-                              current.spindleRunning != lastPublished_.spindleRunning;
+                              current.programEnd != lastPublished_.programEnd;
     const bool heartbeatElapsed = now - lastPublish_ >= heartbeat_;
     return stateChanged || heartbeatElapsed || !hasPublished_;
 }

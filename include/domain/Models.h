@@ -58,8 +58,13 @@ struct MachineData
     /** Indica se a peça está fixada. */
     bool partClamped{false};
 
-    /** Indica se o spindle está em funcionamento. */
-    bool spindleRunning{false};
+    /**
+     * Indica se o fim de programa (M30) está ativo.
+     *
+     * O sinal elétrico é ativo em nível baixo. A camada de aquisição realiza
+     * essa inversão para que true sempre represente a ocorrência do M30.
+     */
+    bool programEnd{false};
 };
 
 /**

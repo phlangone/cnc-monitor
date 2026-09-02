@@ -12,9 +12,10 @@ KpiTracker::KpiTracker(const float filterAlpha) noexcept
 
 const KpiData &KpiTracker::update(const MachineData &sample, const MonotonicTimePoint now) noexcept
 {
+    const bool hadPreviousSample = initialized_;
     const Milliseconds elapsed =
-        initialized_ ? std::chrono::duration_cast<Milliseconds>(now - previousUpdate_)
-                     : Milliseconds{0};
+        hadPreviousSample ? std::chrono::duration_cast<Milliseconds>(now - previousUpdate_)
+                          : Milliseconds{0};
     previousUpdate_ = now;
     initialized_ = true;
 
@@ -28,14 +29,17 @@ const KpiData &KpiTracker::update(const MachineData &sample, const MonotonicTime
         operationTime_ += elapsed;
     }
 
-    if (sample.partClamped && !previousPartClamped_)
+    const bool programFinished =
+        hadPreviousSample && sample.programEnd && !previousSample_.programEnd;
+
+    if (programFinished)
     {
         ++kpis_.partCount;
 
-        if (hasCycleStart_)
+        if (hasPreviousProgramEnd_)
         {
             const Milliseconds cycleTime =
-                std::chrono::duration_cast<Milliseconds>(now - previousCycleStart_);
+                std::chrono::duration_cast<Milliseconds>(now - previousProgramEnd_);
             if (cycleTime.count() != 0)
             {
                 const float cycleTimeMs = static_cast<float>(cycleTime.count());
@@ -48,10 +52,9 @@ const KpiData &KpiTracker::update(const MachineData &sample, const MonotonicTime
             }
         }
 
-        previousCycleStart_ = now;
-        hasCycleStart_ = true;
+        previousProgramEnd_ = now;
+        hasPreviousProgramEnd_ = true;
     }
-    previousPartClamped_ = sample.partClamped;
     previousSample_ = sample;
 
     kpis_.machineOnTimeS = static_cast<std::uint32_t>(machineOnTime_.count() / 1000);
@@ -65,7 +68,7 @@ const KpiData &KpiTracker::update(const MachineData &sample, const MonotonicTime
 
 bool KpiTracker::isOperating(const MachineData &sample) noexcept
 {
-    return sample.spindleRunning && sample.partClamped;
+    return sample.doorClosed && sample.partClamped && !sample.programEnd;
 }
 
 } // namespace cnc

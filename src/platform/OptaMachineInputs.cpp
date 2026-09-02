@@ -14,7 +14,7 @@ void OptaMachineInputs::begin() const noexcept
     pinMode(config::doorClosedPin, INPUT);
     pinMode(config::doorOpenedPin, INPUT);
     pinMode(config::partClampedPin, INPUT);
-    pinMode(config::spindleRunningPin, INPUT);
+    pinMode(config::programEndPin, INPUT);
 }
 
 MachineData OptaMachineInputs::read() const noexcept
@@ -25,7 +25,9 @@ MachineData OptaMachineInputs::read() const noexcept
     sample.doorClosed = digitalRead(config::doorClosedPin) != LOW;
     sample.doorOpened = digitalRead(config::doorOpenedPin) != LOW;
     sample.partClamped = digitalRead(config::partClampedPin) != LOW;
-    sample.spindleRunning = digitalRead(config::spindleRunningPin) != LOW;
+    // O fim de programa permanece eletricamente em nível baixo após o M30 e
+    // retorna ao nível alto somente quando o próximo ciclo é iniciado.
+    sample.programEnd = digitalRead(config::programEndPin) == LOW;
     return sample;
 }
 
