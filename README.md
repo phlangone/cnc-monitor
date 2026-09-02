@@ -1,119 +1,119 @@
-# CNC Monitoring via Industrial IoT
+# Monitoramento de CNC via Internet Industrial das Coisas
 
-## Project Description
+## Descrição do Projeto
 
-This project implements firmware for monitoring a CNC machine with an **Arduino Opta** using Industrial IoT concepts. The Opta reads machine status signals, collects energy metrics from a **Finder 7M energy meter** over **Modbus RTU/RS485**, calculates production KPIs at the edge, and publishes telemetry to an MQTT broker.
+Este projeto implementa um firmware para monitoramento de uma máquina CNC com um **Arduino Opta**, utilizando conceitos de Internet Industrial das Coisas. O Opta lê sinais de estado da máquina, coleta métricas de energia de um **medidor de energia Finder 7M** via **Modbus RTU/RS485**, calcula KPIs de produção na borda e publica a telemetria em um broker MQTT.
 
-The firmware is built with **PlatformIO**, using the **Arduino framework** on top of the Opta's Mbed-based runtime. The application is organized as an RTOS firmware with independent tasks for machine acquisition, energy acquisition, telemetry, and diagnostics.
-
----
-
-## Hardware and I/O Architecture
-
-The physical signal mapping on the **Arduino Opta** is configured in `include/Config.h` and can be overridden through PlatformIO build flags.
-
-Default input mapping:
-
-- **A0:** Machine ON
-- **A1:** Spindle running
-- **A2:** Door closed
-- **A3:** Door opened
-- **A4:** Part clamped
-- **A5:** Machine ready
-- **RS485:** Modbus RTU communication with the Finder 7M energy meter at **38400 baud**
-
-Default diagnostic LED mapping:
-
-- **D0:** System status
-- **D1:** Wi-Fi status
-- **D2:** MQTT status
-- **D3:** Modbus/Finder 7M status
+O firmware é desenvolvido com **PlatformIO**, utilizando o **framework Arduino** sobre o runtime baseado em Mbed do Opta. A aplicação é organizada como um firmware RTOS, com tarefas independentes para aquisição dos sinais da máquina, aquisição de energia, telemetria e diagnóstico.
 
 ---
 
-## Physical Assembly
+## Arquitetura de Hardware e E/S
 
-Below is the representation of the system's physical assembly, detailing the integration between the CNC machine panel, the Arduino Opta, and the Finder 7M energy meter inside the electrical cabinet.
+O mapeamento físico dos sinais no **Arduino Opta** é configurado em `include/Config.h` e pode ser sobrescrito por meio de flags de compilação do PlatformIO.
 
-![assembly](https://github.com/user-attachments/assets/bd2ca228-f3fa-41ba-86a2-1b2bc3e4a9c3)
+Mapeamento padrão das entradas:
+
+- **A0:** Máquina ligada
+- **A1:** Fim de programa
+- **A2:** Porta fechada
+- **A3:** Porta aberta
+- **A4:** Peça fixada
+- **A5:** Máquina pronta
+- **RS485:** Comunicação Modbus RTU com o medidor de energia Finder 7M a **38400 baud**
+
+Mapeamento padrão dos LEDs de diagnóstico:
+
+- **D0:** Estado do sistema
+- **D1:** Estado do Wi-Fi
+- **D2:** Estado do MQTT
+- **D3:** Estado do Modbus/Finder 7M
 
 ---
 
-## Software Architecture
+## Montagem Física
 
-The firmware is split into domain, application, and platform layers:
+Abaixo está a representação da montagem física do sistema, detalhando a integração entre o painel da máquina CNC, o Arduino Opta e o medidor de energia Finder 7M dentro do quadro elétrico.
 
-- `src/domain` and `include/domain` contain hardware-independent rules such as KPI processing, telemetry serialization, and publishing policy.
-- `src/application` and `include/application` compose the firmware and coordinate shared state.
-- `src/platform` and `include/platform` contain hardware adapters for Opta inputs, Finder 7M readings, Wi-Fi/MQTT, diagnostics, logging, and RTOS wrappers.
+![montagem](https://github.com/user-attachments/assets/bd2ca228-f3fa-41ba-86a2-1b2bc3e4a9c3)
 
-The application starts four main RTOS threads:
+---
+
+## Arquitetura de Software
+
+O firmware é dividido em camadas de domínio, aplicação e plataforma:
+
+- `src/domain` e `include/domain` contêm regras independentes de hardware, como processamento de KPIs, serialização da telemetria e política de publicação.
+- `src/application` e `include/application` compõem o firmware e coordenam o estado compartilhado.
+- `src/platform` e `include/platform` contêm adaptadores de hardware para as entradas do Opta, leituras do Finder 7M, Wi-Fi/MQTT, diagnóstico, logging e wrappers de RTOS.
+
+A aplicação inicia quatro threads principais do RTOS:
 
 - **machineThread**  
-  Samples CNC machine signals every **50 ms**, updates machine state, and recalculates KPIs.
+  Amostra os sinais da máquina CNC a cada **50 ms**, atualiza o estado da máquina e recalcula os KPIs.
 
 - **energyThread**  
-  Polls the Finder 7M energy meter every **5000 ms** through RS485/Modbus RTU.
+  Consulta o medidor de energia Finder 7M a cada **5000 ms** via RS485/Modbus RTU.
 
 - **telemetryThread**  
-  Manages Wi-Fi, NTP synchronization, MQTT reconnection, JSON serialization, and telemetry publishing.
+  Gerencia Wi-Fi, sincronização NTP, reconexão MQTT, serialização JSON e publicação da telemetria.
 
 - **diagnosticThread**  
-  Updates local LED diagnostics for system, Wi-Fi, MQTT, and Modbus status.
+  Atualiza os LEDs locais de diagnóstico do sistema, Wi-Fi, MQTT e Modbus.
 
 ---
 
-## Data Model
+## Modelo de Dados
 
-The firmware maintains a coherent system snapshot composed of:
+O firmware mantém um snapshot coerente do sistema composto por:
 
 - **MachineData**  
-  Machine ON, machine ready, door closed/opened, part clamped, and spindle running states.
+  Estados de máquina ligada, máquina pronta, porta fechada/aberta, peça fixada e fim de programa.
 
 - **EnergyData**  
-  Voltage, current, active power, reactive power, apparent power, power factor, frequency, and accumulated active energy.
+  Tensão, corrente, potência ativa, potência reativa, potência aparente, fator de potência, frequência e energia ativa acumulada.
 
 - **KpiData**  
-  Machine-on time, operation time, utilization rate, part count, cycle time, and production cadence.
+  Tempo de máquina ligada, tempo de operação, taxa de utilização, contagem de peças, tempo de ciclo e cadência de produção.
 
-Shared state is centralized through `StateStore`, keeping acquisition, processing, and publishing logic separated.
-
----
-
-## KPI Processing and Edge Intelligence
-
-The firmware processes production indicators directly at the edge:
-
-- **Part counting**  
-  Incremented when a rising edge is detected on the part-clamped signal.
-
-- **Operation time**  
-  Accumulated when the spindle is running and the part is clamped.
-
-- **Machine-on time**  
-  Accumulated while the machine-on signal is active.
-
-- **Utilization rate (%)**  
-  Calculated as operation time divided by machine-on time.
-
-- **Cycle time and cadence**  
-  Calculated from the interval between detected clamp events. Cadence uses an exponential moving average filter with **alpha = 0.2**.
+O estado compartilhado é centralizado por meio do `StateStore`, mantendo separadas as lógicas de aquisição, processamento e publicação.
 
 ---
 
-## Telemetry and MQTT Publishing
+## Processamento de KPIs e Inteligência na Borda
 
-Telemetry is published as JSON to the configured MQTT broker and topic.
+O firmware processa os indicadores de produção diretamente na borda:
 
-Publishing is event-based:
+- **Contagem de peças**  
+  Incrementada quando uma borda de subida é detectada no sinal de peça fixada.
 
-- A message is published immediately after relevant machine state changes.
-- A heartbeat message is published every **60 seconds** if no state changes occur.
-- Wi-Fi and MQTT reconnection attempts use a **5000 ms** interval.
-- Timestamps are generated in ISO-8601 format after NTP synchronization.
-- Payloads are serialized into a local **600-byte** buffer.
+- **Tempo de operação**  
+  Acumulado quando a porta está fechada, a peça está fixada e o sinal de fim de programa não está ativo.
 
-Example payload:
+- **Tempo de máquina ligada**  
+  Acumulado enquanto o sinal de máquina ligada está ativo.
+
+- **Taxa de utilização (%)**  
+  Calculada como o tempo de operação dividido pelo tempo de máquina ligada.
+
+- **Tempo de ciclo e cadência**  
+  Calculados a partir do intervalo entre eventos de fixação detectados. A cadência utiliza um filtro de média móvel exponencial com **alpha = 0,2**.
+
+---
+
+## Telemetria e Publicação MQTT
+
+A telemetria é publicada em formato JSON no broker e tópico MQTT configurados.
+
+A publicação é orientada a eventos:
+
+- Uma mensagem é publicada imediatamente após alterações relevantes no estado da máquina.
+- Uma mensagem de heartbeat é publicada a cada **60 segundos** caso não ocorram alterações de estado.
+- As tentativas de reconexão Wi-Fi e MQTT utilizam um intervalo de **5000 ms**.
+- Os timestamps são gerados no formato ISO-8601 após a sincronização NTP.
+- Os payloads são serializados em um buffer local de **600 bytes**.
+
+Exemplo de payload:
 
 ```json
 {
@@ -132,7 +132,7 @@ Example payload:
     "doorClosed": 1,
     "doorOpened": 0,
     "partClamped": 1,
-    "spindleRunning": 1,
+    "programEnd": 0,
     "machineOnTimeS": 3600,
     "operationTimeS": 2700,
     "utilizationRate": 75.0,
@@ -145,9 +145,9 @@ Example payload:
 
 ---
 
-## PlatformIO Setup
+## Configuração do PlatformIO
 
-Required PlatformIO environment:
+Ambiente PlatformIO necessário:
 
 ```ini
 [env:opta]
@@ -156,7 +156,7 @@ board = opta
 framework = arduino
 ```
 
-Project dependencies:
+Dependências do projeto:
 
 ```ini
 lib_deps =
@@ -165,7 +165,7 @@ lib_deps =
 	arduino-libraries/NTPClient@^3.2.1
 ```
 
-Typical commands:
+Comandos típicos:
 
 ```bash
 pio run
@@ -175,70 +175,70 @@ pio device monitor
 
 ---
 
-## Monitoring Dashboards
+## Dashboards de Monitoramento
 
-Below are examples of the processed edge data visualized in the cloud platform.
+Abaixo estão exemplos dos dados processados na borda e visualizados na plataforma em nuvem.
 
-### Production and OEE Dashboard
+### Dashboard de Produção e OEE
 
-Panel displaying the main operational indicators, including part count, machine utilization rate, cycle time, and real-time production cadence.
+Painel exibindo os principais indicadores operacionais, incluindo contagem de peças, taxa de utilização da máquina, tempo de ciclo e cadência de produção em tempo real.
 
-<img width="1920" height="1080" alt="Production and OEE dashboard" src="https://github.com/user-attachments/assets/7022a33d-7407-4e7e-ace1-81decd611fe7" />
-
----
-
-### Energy Dashboard
-
-Panel dedicated to electrical monitoring of the equipment, recording power consumption, power factor, voltage, current, frequency, and accumulated energy through Modbus RTU integration.
-
-<img width="1920" height="1080" alt="Energy dashboard" src="https://github.com/user-attachments/assets/16fef7fa-5992-45d8-a39d-82e004d0d672" />
+<img width="1920" height="1080" alt="Dashboard de produção e OEE" src="https://github.com/user-attachments/assets/7022a33d-7407-4e7e-ace1-81decd611fe7" />
 
 ---
 
-## Visual Diagnostics
+### Dashboard de Energia
 
-LED indicators on the Opta simplify field diagnostics:
+Painel dedicado ao monitoramento elétrico do equipamento, registrando consumo de potência, fator de potência, tensão, corrente, frequência e energia acumulada por meio da integração Modbus RTU.
 
-- **System LED (D0)**  
-  Slow blinking indicates that the firmware is running.
-
-- **Wi-Fi LED (D1)**  
-  Slow blinking while connecting and steady ON when connected.
-
-- **MQTT LED (D2)**  
-  Slow blinking while disconnected and steady ON when connected to the broker.
-
-- **Modbus LED (D3)**  
-  Pulse indicates successful Finder 7M readings. Fast blinking indicates initialization or read errors.
+<img width="1920" height="1080" alt="Dashboard de energia" src="https://github.com/user-attachments/assets/16fef7fa-5992-45d8-a39d-82e004d0d672" />
 
 ---
 
-## Local Secrets Workflow
+## Diagnóstico Visual
 
-This repository includes `secrets.example.ini` as a safe template. The real `secrets.ini` file is ignored by Git and must stay local because it contains Wi-Fi and MQTT credentials.
+Os indicadores LED do Opta simplificam o diagnóstico em campo:
 
-Before building or flashing the firmware, copy the example file:
+- **LED do sistema (D0)**  
+  Piscando lentamente indica que o firmware está em execução.
+
+- **LED do Wi-Fi (D1)**  
+  Pisca lentamente durante a conexão e permanece aceso quando conectado.
+
+- **LED do MQTT (D2)**  
+  Pisca lentamente enquanto desconectado e permanece aceso quando conectado ao broker.
+
+- **LED do Modbus (D3)**  
+  Um pulso indica leituras bem-sucedidas do Finder 7M. Piscadas rápidas indicam erros de inicialização ou de leitura.
+
+---
+
+## Fluxo Local de Segredos
+
+Este repositório inclui `secrets.example.ini` como modelo seguro. O arquivo real `secrets.ini` é ignorado pelo Git e deve permanecer local, pois contém as credenciais de Wi-Fi e MQTT.
+
+Antes de compilar ou gravar o firmware, copie o arquivo de exemplo:
 
 ```bash
 cp secrets.example.ini secrets.ini
 ```
 
-On Windows PowerShell:
+No Windows PowerShell:
 
 ```powershell
 Copy-Item secrets.example.ini secrets.ini
 ```
 
-Then edit `secrets.ini` with the real values for:
+Depois, edite `secrets.ini` com os valores reais para:
 
-- Wi-Fi SSID and password
-- MQTT broker address and port
-- MQTT client ID
-- MQTT username and password
-- MQTT topic
+- SSID e senha do Wi-Fi
+- Endereço e porta do broker MQTT
+- ID do cliente MQTT
+- Usuário e senha do MQTT
+- Tópico MQTT
 
 ---
 
-## License
+## Licença
 
-This project is licensed under the MIT License. See `LICENSE` for details.
+Este projeto é licenciado sob a Licença MIT. Consulte `LICENSE` para mais detalhes.
